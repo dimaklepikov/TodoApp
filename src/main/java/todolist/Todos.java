@@ -1,10 +1,18 @@
 package todolist;
 
-public class Todos {
+import javax.persistence.Entity;
+import javax.persistence.Id;
 
+@Entity
+public class Todos {
+    @Id
     private Integer id;
     private String name;
     private String description;
+
+    public Todos() {
+
+    }
 
     public Todos(Integer id, String name, String description) {
         this.id = id;
