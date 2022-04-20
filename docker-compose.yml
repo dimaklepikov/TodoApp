@@ -1,0 +1,34 @@
+version: '3.7'
+
+networks:
+  tododata:
+    driver: bridge
+
+volumes:
+  tododata_center_postgres:
+  tododata_center_neo4j:
+  tododata_center_elastic:
+
+services:
+  postgres:
+    restart: on-failure
+    image: postgres:14
+    init: true
+    container_name: tododata_center_postgres
+    networks:
+      - tododata
+    volumes:
+      - tododata_center_postgres:/data
+    ports:
+      - 5432:5432
+    environment:
+      PGDATA: /data
+      POSTGRES_DB: tododata
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: tododata
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d tododata"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 10s
