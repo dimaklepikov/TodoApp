@@ -3,14 +3,13 @@ pipeline {
   stages {
     stage('Cloning Git') {
       steps {
-        git 'https://github.com/gustavoapolinario/microservices-node-example-todo-frontend.git'
+        git 'https://github.com/uzigang16/TodoApp.git'
       }
     }
     stage('Building image') {
       steps{
-        script {
-          docker.build
-        }
+        sh 'export DOCKER_BUILDKIT=1'
+        sh 'docker build .'
       }
     }
   }
