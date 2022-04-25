@@ -1,7 +1,9 @@
 pipeline {
   agent any
   environment {
-      DOCKER_BUILDKIT='1'
+      DOCKER_BUILDKIT = '1'
+      registryCredentials = 'c199a03e-0881-4550-a00f-bce97bc3dc22'
+      registry = "localhost:8082/"
   }
   stages {
     stage('Cloning Git') {
@@ -11,8 +13,17 @@ pipeline {
     }
     stage('Building image') {
       steps{
-        sh 'export DOCKER_BUILDKIT=1'
-        sh 'docker build .'
+        script {
+        DockerImage = docker.build .
+        }
+      }
+    }
+    stage('Uploading to Nexus') {
+      steps{
+        script {
+         docker.withRegistry( 'http://'+registry, registryCredentials ) {
+         DockerImage.push('latest')
+        }
       }
     }
   }
