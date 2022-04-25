@@ -1,0 +1,39 @@
+pipeline {
+  agent any
+  environment {
+      DOCKER_BUILDKIT = '1'
+      REGISTRY_CREDENTIALS = 'd08fc05c-36d9-4ca7-9d41-8d30ca8b1687'
+      NEXUS = 'nexus:8081'
+      DOCKER_IMAGE = 'nexus:8081/todoapp'
+      DOCKER_HOST = 'unix:///var/run/docker.sock'
+  }
+  stages {
+    stage('Cloning Git') {
+        steps {
+          git 'https://github.com/uzigang16/TodoApp.git'
+        }
+      }
+
+    stage('Prepare environment') {
+        steps {
+                script {
+                    // def parsed_version = sh(script: 'mvn help:evaluate -Dexpression=project.version -q -DforceStdout', returnStdout: true).trim()
+                    def parsed_version = '0.1.2'
+                    env.VERSION = parsed_version + '-' + Long.toString(System.currentTimeMillis())
+                } // script
+        } // steps
+    } // stage
+
+    stage('Build & Push Docker Image') {
+        steps {
+                script {
+                    def docker = load 'ops/Jenkinsfile.include/docker.groovy'
+                    docker.buildAndUpload('ops/Dockerfile')
+                } // script
+        } // steps
+    } // stage
+
+
+  }
+}
+
