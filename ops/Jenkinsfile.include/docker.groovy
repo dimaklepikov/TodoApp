@@ -1,13 +1,19 @@
 def buildAndUpload(String dockerfilePath) {
-    // withDockerRegistry([ credentialsId: "d08fc05c-36d9-4ca7-9d41-8d30ca8b1687", url: "" ]) {
+    withDockerRegistry([ credentialsId: "${REGISTRY_CREDENTIALS}", url: "http://" + "${REGISTRY}" ]) {
         wrap([$class: 'AnsiColorBuildWrapper', 'colorMapName': 'XTerm']) {
-            sh "docker build . -t ${DOCKER_IMAGE}:${env.VERSION}"
+
+            todoImage = docker.build("${DOCKER_IMAGE}",  "-f ${dockerfilePath} .")
+            // docker.push("${REGISTRY}", "${DOCKER_IMAGE}:latest")
+            sh "docker tag ${DOCKER_IMAGE} ${REGISTRY}/${DOCKER_IMAGE}:latest"
+            sh "docker push ${REGISTRY}/${DOCKER_IMAGE}:latest"
+            // def todoImage = "docker build -t ${DOCKER_IMAGE}:${env.VERSION} -f ${dockerfilePath} ."
+            // todoImage.push("${env.VERSION}, ")
 
             // docker.build("${DOCKER_IMAGE}:${env.VERSION}", "--no-cache -f ${WORKSPACE}/${dockerfilePath} .").push()
         }
-    // }
+    }
 }
 
-def deleteImage() { sh "docker image rm -f ${DOCKER_IMAGE}:${env.VERSION}" }
+def deleteImage() { sh "docker image rm -f ${DOCKER_IMAGE}:latest" }
 
 return this

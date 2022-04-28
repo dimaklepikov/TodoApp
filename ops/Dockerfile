@@ -8,3 +8,4 @@ FROM openjdk:18-slim-buster
 COPY --from=builder /app/target/todo-data.jar /app/todo-data.jar
 RUN ls -l /app
 CMD ["java","-jar","/app/todo-data.jar"]
+EXPOSE 80
